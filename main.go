@@ -9,9 +9,17 @@ import (
 
 var albums = lib.List{Head: nil}
 
+func removeLastAlbum(c *gin.Context) {
+    albums.RemoveTail()
+    c.IndentedJSON(http.StatusOK, nil)
+}
 
 func getAlbums(c *gin.Context) {
-    c.IndentedJSON(http.StatusOK, albums.ConvertToList())
+    c.IndentedJSON(http.StatusOK, albums.ConvertToReverseArray())
+}
+
+func getHead(c *gin.Context) {
+    c.IndentedJSON(http.StatusOK, albums.Head.Album)
 }
 
 func addAlbum(c *gin.Context) {
@@ -52,7 +60,9 @@ func main() {
     router := gin.Default()
     router.GET("/albums", getAlbums)
     router.POST("/albums", addAlbum)
-    router.GET("albums/:id", getAlbumById)
+    router.GET("/albums/:id", getAlbumById)
+    router.GET("/albums/head", getHead)
+    router.DELETE("/albums", removeLastAlbum)
 
     router.Run("localhost:8080")
 }
