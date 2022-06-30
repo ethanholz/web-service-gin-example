@@ -3,18 +3,60 @@ package lib
 type Node struct {
     Album Album
     next *Node
+    prev *Node
 }
 
 type List struct {
     Head *Node
+    Tail *Node
+}
+
+
+func (L *List) RemoveTail() {
+    lastNode := L.Tail
+    if L.Tail.prev == nil && L.Tail.next == nil {
+        L.Tail = nil
+        L.Head = nil
+        return
+    }
+    newTail := lastNode.prev
+    newTail.next = nil
+    L.Tail = newTail
+}
+
+func (L *List) InsertStart(album Album){
+    newNode := &Node {
+        Album: album,
+        next: nil,
+        prev: nil,
+    }
+
+    if L.Tail == nil && L.Head == nil {
+        L.Head = newNode
+        L.Tail = newNode
+        return
+    }
+    firstNode := L.Head
+    firstNode.prev = newNode
+    newNode.next = firstNode
+    L.Head = newNode
 }
 
 func (L *List) Insert(album Album){
-    list := &Node {
+    newNode := &Node {
         Album: album,
-        next: L.Head,
+        next: nil,
+        prev: nil,
     }
-    L.Head = list
+    if L.Tail == nil && L.Head == nil{
+        L.Tail = newNode
+        L.Head = newNode
+        return
+    }
+    lastNode := L.Tail
+    lastNode.next = newNode
+    newNode.prev = lastNode
+    L.Tail = newNode
 }
 
 func (L *List) GetLength() int {
@@ -39,12 +81,22 @@ func (L *List) GetNodeById(id int) *Node {
     return nil
 }
 
-func (L *List) ConvertToList() []Album {
+func (L *List) ConvertToArray() []Album {
     var albumArray []Album
     start := L.Head
     for start != nil {
         albumArray = append(albumArray, start.Album)
         start = start.next
+    }
+    return albumArray
+}
+
+func (L *List) ConvertToReverseArray() []Album {
+    var albumArray []Album
+    start := L.Tail
+    for start != nil {
+        albumArray = append(albumArray, start.Album)
+        start = start.prev
     }
     return albumArray
 }
