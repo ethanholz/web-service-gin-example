@@ -29,7 +29,7 @@ func addAlbum(c *gin.Context) {
 	if err := c.BindJSON(&newAlbum); err != nil {
 		return
 	}
-	length := albums.GetLength()
+	length := albums.Length
 	// Always increment the ID based on length rather than
 	// using specified
 	if newAlbum.ID != length {
@@ -42,7 +42,7 @@ func addAlbum(c *gin.Context) {
 func getAlbumById(c *gin.Context) {
 	id := c.Param("id")
 	int_id, _ := strconv.Atoi(id)
-	if int_id <= albums.GetLength() {
+	if int_id <= albums.Length {
 		albumNode := albums.GetNodeById(int_id)
 		if albumNode != nil {
 			c.IndentedJSON(http.StatusOK, &albumNode.Album)
