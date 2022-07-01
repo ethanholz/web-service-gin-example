@@ -1,5 +1,7 @@
 package lib
 
+import "errors"
+
 type Node struct {
 	Album Album
 	next  *Node
@@ -7,20 +9,43 @@ type Node struct {
 }
 
 type List struct {
-	Head *Node
-	Tail *Node
+	Head   *Node
+	Tail   *Node
+	Length int
 }
 
-func (L *List) RemoveTail() {
+func (L *List) RemoveHead() (*Album, error) {
+	if L.Head == nil && L.Tail == nil && L.Length == 0 {
+		return nil, errors.New("List is empty")
+	}
+	L.Length--
+	frontNode := L.Head
+	if L.Head.prev == nil && L.Head.next == nil {
+		L.Tail = nil
+		L.Head = nil
+		return &frontNode.Album, nil
+	}
+	newHead := frontNode.next
+	newHead.prev = nil
+	L.Head = newHead
+	return &frontNode.Album, nil
+}
+
+func (L *List) RemoveTail() (*Album, error) {
+	if L.Head == nil && L.Tail == nil && L.Length == 0 {
+		return nil, errors.New("List is empty")
+	}
+	L.Length--
 	lastNode := L.Tail
 	if L.Tail.prev == nil && L.Tail.next == nil {
 		L.Tail = nil
 		L.Head = nil
-		return
+		return &lastNode.Album, nil
 	}
 	newTail := lastNode.prev
 	newTail.next = nil
 	L.Tail = newTail
+	return &lastNode.Album, nil
 }
 
 func (L *List) InsertStart(album Album) {
@@ -29,7 +54,7 @@ func (L *List) InsertStart(album Album) {
 		next:  nil,
 		prev:  nil,
 	}
-
+	L.Length++
 	if L.Tail == nil && L.Head == nil {
 		L.Head = newNode
 		L.Tail = newNode
@@ -47,6 +72,7 @@ func (L *List) Insert(album Album) {
 		next:  nil,
 		prev:  nil,
 	}
+	L.Length++
 	if L.Tail == nil && L.Head == nil {
 		L.Tail = newNode
 		L.Head = newNode
@@ -56,17 +82,6 @@ func (L *List) Insert(album Album) {
 	lastNode.next = newNode
 	newNode.prev = lastNode
 	L.Tail = newNode
-}
-
-func (L *List) GetLength() int {
-	length := 0
-	start := L.Head
-	length++
-	for start != nil {
-		start = start.next
-		length++
-	}
-	return length
 }
 
 func (L *List) GetNodeById(id int) *Node {
@@ -81,21 +96,21 @@ func (L *List) GetNodeById(id int) *Node {
 }
 
 func (L *List) ConvertToArray() []Album {
-	var albumArray []Album
+	albumSlice := make([]Album, 0)
 	start := L.Head
 	for start != nil {
-		albumArray = append(albumArray, start.Album)
+		albumSlice = append(albumSlice, start.Album)
 		start = start.next
 	}
-	return albumArray
+	return albumSlice
 }
 
 func (L *List) ConvertToReverseArray() []Album {
-	var albumArray []Album
+	albumSlice := make([]Album, 0)
 	start := L.Tail
 	for start != nil {
-		albumArray = append(albumArray, start.Album)
+		albumSlice = append(albumSlice, start.Album)
 		start = start.prev
 	}
-	return albumArray
+	return albumSlice
 }
